@@ -1,0 +1,1022 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0b">
+<meta name="description" content="El Traidor. Juego social de palabras y traidores.">
+<meta name="application-name" content="El Traidor">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<title>El Traidor</title>
+
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+
+<style>
+:root {
+  --bg: #0b0b0b;
+  --white: #ffffff;
+  --red: #b71928;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.app {
+  max-width: 480px;
+  margin: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 22px 20px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  height: 48px;
+}
+
+.gear {
+  width: 46px;
+  height: 46px;
+  border: 1px solid #555;
+  background: transparent;
+  color: white;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.gear img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.rose-fallback {
+  display: none;
+  color: var(--red);
+  font-size: 32px;
+  line-height: 1;
+}
+
+.screen {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* INICIO */
+
+.home {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.home h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(58px, 15vw, 85px);
+  line-height: 0.94;
+  letter-spacing: -3px;
+  margin: 0;
+}
+
+.home h1 span {
+  display: block;
+  color: var(--red);
+}
+
+.home .primary {
+  margin-top: 42px;
+  max-width: 320px;
+}
+
+.primary,
+.outline {
+  min-height: 52px;
+  width: 100%;
+  border: 0;
+  background: var(--red);
+  color: white;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.outline {
+  background: transparent;
+  border: 1px solid #777;
+}
+
+/* CONFIGURACIÓN */
+
+.settings {
+  gap: 18px;
+}
+
+.settings h2 {
+  font: 700 38px Georgia, serif;
+  margin: 15px 0 4px;
+}
+
+.heading {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 8px 0 10px;
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.name-row {
+  display: flex;
+  gap: 8px;
+}
+
+.name-row input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  background: #171717;
+  border: 1px solid #444;
+  border-radius: 0;
+  padding: 0 12px;
+  color: white;
+}
+
+.remove {
+  width: 45px;
+  background: #171717;
+  color: white;
+  border: 1px solid #444;
+  font-size: 23px;
+}
+
+.add {
+  height: 46px;
+  background: transparent;
+  border: 1px dashed #777;
+  color: white;
+  font-weight: 700;
+}
+
+.count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.counter button {
+  width: 42px;
+  height: 42px;
+  background: #1b1b1b;
+  border: 1px solid #555;
+  color: white;
+  font-size: 25px;
+}
+
+.counter strong {
+  font-size: 24px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.bottom {
+  margin-top: auto;
+  padding-top: 15px;
+}
+
+.error {
+  color: #ff7f89;
+  min-height: 22px;
+  font-size: 13px;
+  margin-top: 9px;
+}
+
+/* REPARTO */
+
+.deal {
+  align-items: center;
+  justify-content: center;
+  gap: 17px;
+  text-align: center;
+}
+
+.progress {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.card {
+  display: block;
+  border: 0;
+  background: none;
+  padding: 0;
+  width: min(78vw, 310px);
+  aspect-ratio: 3 / 4.25;
+  perspective: 1100px;
+  touch-action: manipulation;
+}
+
+.card-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s ease;
+}
+
+.card.revealed .card-inner {
+  transform: rotateY(180deg);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+  border: 3px solid white;
+}
+
+.card-back {
+  background: #171717;
+  transform: rotateY(0deg);
+}
+
+.card-back img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-front {
+  background: white;
+  color: #0b0b0b;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  gap: 24px;
+}
+
+.card-front .who {
+  font: 700 clamp(22px, 6vw, 31px) Georgia, serif;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.card-front .word {
+  font: 900 clamp(27px, 7vw, 41px) Arial, sans-serif;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  line-height: 1.12;
+}
+
+.card-front .word.traitor {
+  color: var(--red);
+}
+
+.deal-action {
+  width: 100%;
+  max-width: 340px;
+  min-height: 52px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* FINAL */
+
+.end {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.end h2 {
+  font: 700 44px Georgia, serif;
+  margin: 0;
+}
+
+.starter {
+  font: 700 clamp(35px, 10vw, 55px) Georgia, serif;
+  color: var(--red);
+  overflow-wrap: anywhere;
+}
+
+.end .primary,
+.end .outline {
+  max-width: 340px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-inner {
+    transition: none;
+  }
+}
+
+@media (max-height: 700px) {
+  .card {
+    width: min(62vw, 240px);
+  }
+
+  .deal {
+    gap: 12px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+  <header class="header">
+    <button
+      class="gear"
+      id="gear"
+      aria-label="Configuración"
+      title="Configuración"
+    >
+      <img
+        src="./rosa.png"
+        alt=""
+        onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
+      >
+      <span class="rose-fallback" aria-hidden="true">✿</span>
+    </button>
+  </header>
+
+  <!-- PANTALLA DE INICIO -->
+
+  <section id="home" class="screen home active">
+    <h1>EL<span>TRAIDOR</span></h1>
+
+    <button id="homeStart" class="primary">
+      Jugar
+    </button>
+  </section>
+
+  <!-- CONFIGURACIÓN -->
+
+  <section id="settings" class="screen settings">
+
+    <h2>Jugadores</h2>
+
+    <div id="names" class="names"></div>
+
+    <button id="addPlayer" class="add">
+      + Añadir jugador
+    </button>
+
+    <div class="count-row">
+      <span class="heading">Traidores</span>
+
+      <div class="counter">
+        <button id="minus" aria-label="Menos traidores">−</button>
+        <strong id="traitorCount">1</strong>
+        <button id="plus" aria-label="Más traidores">+</button>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <button id="begin" class="primary">
+        Comenzar
+      </button>
+
+      <div id="error" class="error" role="alert"></div>
+    </div>
+
+  </section>
+
+  <!-- CARTAS -->
+
+  <section id="deal" class="screen deal">
+
+    <div id="progress" class="progress"></div>
+
+    <button
+      id="card"
+      class="card"
+      aria-label="Girar carta"
+      aria-pressed="false"
+    >
+      <span class="card-inner">
+
+        <span class="face card-back">
+          <img
+            src="./imagen.png"
+            alt="Reverso de la carta"
+            draggable="false"
+          >
+        </span>
+
+        <span class="face card-front">
+          <strong id="frontName" class="who"></strong>
+          <strong id="frontWord" class="word"></strong>
+        </span>
+
+      </span>
+    </button>
+
+    <button id="next" class="primary deal-action hidden">
+      Ocultar y continuar
+    </button>
+
+  </section>
+
+  <!-- FINAL -->
+
+  <section id="end" class="screen end">
+
+    <h2>Comienza</h2>
+
+    <div id="starter" class="starter"></div>
+
+    <button id="again" class="primary">
+      Nueva partida
+    </button>
+
+    <button id="edit" class="outline">
+      Jugadores
+    </button>
+
+  </section>
+
+</main>
+
+<script>
+(() => {
+  'use strict';
+
+  /* PALABRAS DEL JUEGO */
+
+  const WORDS = [
+    "abanico", "abeto", "acantilado", "aceite", "aceituna",
+    "acelga", "acróbata", "actor", "actriz", "aeropuerto",
+    "aguacate", "ajo", "albañil", "alcachofa", "algodón",
+    "alicate", "almacén", "almeja", "almendra", "almohada",
+    "altavoz", "ambulancia", "anchoa", "ancla", "antifaz",
+    "archipiélago", "arcilla", "arco", "ardilla", "arena",
+    "arpa", "arroyo", "ascensor", "aspiradora", "astronauta",
+    "atún", "automóvil", "autopista", "avellana", "avispa",
+    "avión", "azada", "azotea", "azúcar", "bacalao",
+    "bahía", "bailarín", "balcón", "ballena", "ballesta",
+    "balsa", "bambú", "banco", "bandeja", "baraja",
+    "barandilla", "barbacoa", "barco", "barranco", "bastón",
+    "batería", "batido", "batidora", "bañera", "bebé",
+    "berenjena", "biblioteca", "bicicleta", "bisagra", "bizcocho",
+    "blusa", "bocadillo", "bocina", "boina", "bolsillo",
+    "bombo", "boniato", "bote", "boxeador", "brócoli",
+    "brújula", "bufanda", "burro", "buzón", "búfalo",
+    "búho", "cabina", "cacahuete", "cacao", "cacatúa",
+    "cacerola", "cafetera", "cajón", "calabacín", "calcetín",
+    "calculadora", "cama", "camaleón", "camarero", "camino",
+    "camiseta", "camión", "campana", "canario", "canela",
+    "canica", "canoa", "cantante", "capucha", "caracola",
+    "caramelo", "carreta", "carretilla", "carro", "cartel",
+    "cartera", "cartero", "casa", "cascabel", "casco",
+    "castillo", "castor", "cazador", "cañón", "cementerio",
+    "cereza", "cerilla", "cerradura", "cesta", "champiñón",
+    "charco", "chimenea", "chimpancé", "chocolate", "churro",
+    "ciempiés", "cigarra", "cigüeña", "cinturón", "cisne",
+    "clarinete", "clavel", "clavo", "coche", "cocinero",
+    "coco", "codorniz", "colador", "colchón", "colgante",
+    "colibrí", "coliflor", "collar", "cometa", "concha",
+    "cono", "coral", "corbata", "cordero", "corona",
+    "cortina", "corzo", "costilla", "cristal", "croissant",
+    "cuaderno", "cuadro", "cuarzo", "cubo", "cucaracha",
+    "cuchara", "cuchillo", "cuenco", "cuerda", "cuervo",
+    "cueva", "dado", "delfín", "dentista", "despertador",
+    "diadema", "disco", "donut", "elefante", "embalse",
+    "embudo", "enchufe", "ensalada", "escalera", "escoba",
+    "escritorio", "escuela", "escultura", "esmeralda", "espejo",
+    "esponja", "esqueleto", "establo", "estadio", "estanque",
+    "estantería", "estatua", "excavadora", "faisán", "falda",
+    "farmacia", "faro", "farol", "ferrocarril", "fideo",
+    "filete", "flamenco", "flan", "flauta", "flecha",
+    "flor", "flotador", "fortaleza", "frambuesa", "fregadero",
+    "fregona", "fuente", "furgoneta", "fósil", "gabardina",
+    "gafas", "galleta", "gallina", "gamba", "ganso",
+    "garaje", "garbanzo", "garrapata", "garza", "gato",
+    "gaviota", "gazpacho", "girasol", "glaciar", "globo",
+    "gofre", "gorila", "gorrión", "grapadora", "grillo",
+    "guirnalda", "guisante", "guitarra", "hacha", "halcón",
+    "hamaca", "hamburguesa", "helado", "helecho", "hiena",
+    "hipopótamo", "hoja", "hongo", "hormiga", "hortensia",
+    "hotel", "huevo", "iceberg", "iguana", "impresora",
+    "imán", "inodoro", "jabalí", "jabón", "jaguar",
+    "jamón", "jarrón", "jazmín", "jeringuilla", "jirafa",
+    "juez", "jungla", "kayak", "kiwi", "koala",
+    "laguna", "lana", "lancha", "langosta", "lavabo",
+    "lavadora", "lavanda", "lechuga", "lechuza", "lenteja",
+    "libro", "libélula", "liebre", "lima", "limón",
+    "lince", "llave", "lobo", "lombriz", "loro",
+    "lupa", "lámpara", "lápiz", "maceta", "magdalena",
+    "maleta", "mandarina", "mango", "manguera", "manta",
+    "mantel", "mapa", "mapache", "maraca", "marco",
+    "margarita", "mariposa", "matraz", "mayonesa", "mejillón",
+    "melocotón", "mermelada", "mesa", "microscopio", "micrófono",
+    "mineral", "mofeta", "mono", "monopatín", "monumento",
+    "mora", "morsa", "mosca", "mostaza", "moto",
+    "muelle", "muralla", "musgo", "muñeca", "máscara",
+    "móvil", "naranja", "narciso", "navaja", "nevera",
+    "niebla", "nube", "nuez", "ordenador", "ortiga",
+    "oso", "ostra", "oveja", "pajarita", "pala",
+    "palacio", "palmera", "paloma", "pan", "panda",
+    "pandereta", "pantera", "papaya", "paraguas", "parque",
+    "parrilla", "pasta", "pastel", "patata", "patinete",
+    "pavo", "payaso", "pañuelo", "pedal", "pegamento",
+    "pelota", "peluca", "peluche", "pelícano", "pepino",
+    "percha", "perdiz", "perezoso", "perro", "pesa",
+    "pez", "piano", "pijama", "pimiento", "pincel",
+    "pingüino", "pintor", "piscina", "pistacho", "piñata",
+    "plato", "pluma", "plátano", "policía", "polilla",
+    "pollo", "portal", "postal", "presa", "probeta",
+    "proyector", "puerro", "pulpo", "pulsera", "puma",
+    "queso", "quiosco", "radio", "rama", "rana",
+    "raqueta", "ratón", "ravioli", "regadera", "regla",
+    "reloj", "relámpago", "repollo", "restaurante", "retrato",
+    "robot", "roca", "rosa", "rosquilla", "rotonda",
+    "rubí", "río", "sacacorchos", "sacapuntas", "sal",
+    "salamandra", "salmón", "salsa", "saltamontes", "sandalia",
+    "sandía", "sardina", "sartén", "satélite", "secador",
+    "selva", "serrucho", "seta", "sillón", "sirena",
+    "sobre", "sopa", "submarino", "suéter", "tabla",
+    "taco", "tacón", "tambor", "tarta", "taza",
+    "teatro", "teclado", "tejado", "tejón", "telaraña",
+    "televisor", "teléfono", "tenedor", "tetera", "tiburón",
+    "tigre", "tijeras", "tinta", "tocadiscos", "tomate",
+    "tormenta", "tornado", "tornillo", "toro", "torre",
+    "tortilla", "tortuga", "tostadora", "tractor", "traje",
+    "trampolín", "tranvía", "tren", "triciclo", "trineo",
+    "trombón", "tronco", "trucha", "trébol", "tuba",
+    "tubo", "tucán", "tuerca", "tumba", "túnel",
+    "uniforme", "universidad", "uva", "vagón", "vainilla",
+    "vajilla", "valle", "vaso", "vela", "ventana",
+    "ventilador", "vestíbulo", "viento", "vinagre", "vinilo",
+    "volcán", "zanahoria", "zapatilla", "zapato", "zorro",
+    "zumo", "águila", "árbol", "órgano"
+  ];
+
+  /* ELEMENTOS */
+
+  const $ = id => document.getElementById(id);
+
+  let players = ['', '', ''];
+  let traitors = 1;
+  let roles = [];
+  let turn = 0;
+  let lastWord = null;
+  let locked = false;
+  let changingCard = false;
+
+  /* GUARDAR CONFIGURACIÓN */
+
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem('elTraidorSettings') || 'null'
+    );
+
+    if (
+      Array.isArray(saved?.players) &&
+      saved.players.length >= 3
+    ) {
+      players = saved.players.slice(0, 30).map(String);
+    }
+
+    if (Number.isInteger(saved?.traitors)) {
+      traitors = saved.traitors;
+    }
+  } catch (error) {
+    console.warn('No se pudo recuperar la configuración.');
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(
+        'elTraidorSettings',
+        JSON.stringify({ players, traitors })
+      );
+    } catch (error) {
+      console.warn('No se pudo guardar la configuración.');
+    }
+  }
+
+  /* PANTALLAS */
+
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(el => {
+      el.classList.toggle('active', el.id === id);
+    });
+
+    window.scrollTo(0, 0);
+  }
+
+  /* ALEATORIEDAD */
+
+  function rand(n) {
+    if (window.crypto?.getRandomValues) {
+      const a = new Uint32Array(1);
+      const limit = 4294967296 - (4294967296 % n);
+
+      do {
+        crypto.getRandomValues(a);
+      } while (a[0] >= limit);
+
+      return a[0] % n;
+    }
+
+    return Math.floor(Math.random() * n);
+  }
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = rand(i + 1);
+
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+
+    return array;
+  }
+
+  /* CONTADOR DE TRAIDORES */
+
+  function counter() {
+    traitors = Math.max(
+      1,
+      Math.min(traitors, players.length - 1)
+    );
+
+    $('traitorCount').textContent = traitors;
+
+    $('minus').disabled = traitors === 1;
+
+    $('plus').disabled =
+      traitors >= players.length - 1;
+  }
+
+  /* LISTA DE JUGADORES */
+
+  function renderNames() {
+    const parent = $('names');
+
+    parent.replaceChildren();
+
+    players.forEach((name, i) => {
+      const row = document.createElement('div');
+      row.className = 'name-row';
+
+      const inp = document.createElement('input');
+
+      inp.value = name;
+      inp.placeholder = 'Jugador ' + (i + 1);
+      inp.maxLength = 28;
+      inp.setAttribute(
+        'aria-label',
+        'Jugador ' + (i + 1)
+      );
+
+      inp.addEventListener('input', () => {
+        players[i] = inp.value;
+        save();
+      });
+
+      const remove = document.createElement('button');
+
+      remove.className = 'remove';
+      remove.textContent = '×';
+      remove.title = 'Eliminar';
+      remove.setAttribute(
+        'aria-label',
+        'Eliminar jugador ' + (i + 1)
+      );
+
+      remove.disabled = players.length <= 3;
+
+      remove.addEventListener('click', () => {
+        players.splice(i, 1);
+        renderNames();
+        save();
+      });
+
+      row.append(inp, remove);
+      parent.append(row);
+    });
+
+    $('addPlayer').disabled = players.length >= 30;
+
+    counter();
+  }
+
+  /* COMENZAR PARTIDA */
+
+  function start() {
+    const names = players.map(name => name.trim());
+
+    if (names.length < 3 || names.some(name => !name)) {
+      $('error').textContent =
+        'Introduce al menos 3 nombres.';
+      return;
+    }
+
+    const uniqueNames = new Set(
+      names.map(name => name.toLocaleLowerCase('es'))
+    );
+
+    if (uniqueNames.size !== names.length) {
+      $('error').textContent = 'No repitas nombres.';
+      return;
+    }
+
+    players = names;
+    save();
+
+    $('error').textContent = '';
+
+    let word = WORDS[rand(WORDS.length)];
+
+    if (WORDS.length > 1) {
+      while (word === lastWord) {
+        word = WORDS[rand(WORDS.length)];
+      }
+    }
+
+    lastWord = word;
+
+    const indices = shuffle([...players.keys()]);
+
+    const traitorSet = new Set(
+      indices.slice(0, traitors)
+    );
+
+    roles = players.map((name, i) => {
+      const isTraitor = traitorSet.has(i);
+
+      return {
+        name,
+        word: isTraitor ? 'TRAIDOR' : word,
+        traitor: isTraitor
+      };
+    });
+
+    turn = 0;
+
+    deal();
+    show('deal');
+  }
+
+  /* PREPARAR CARTA */
+
+  function deal() {
+    locked = false;
+    changingCard = false;
+
+    const role = roles[turn];
+
+    $('progress').textContent =
+      (turn + 1) + ' / ' + roles.length;
+
+    $('frontName').textContent = '';
+    $('frontWord').textContent = '';
+
+    $('frontWord').classList.toggle(
+      'traitor',
+      role.traitor
+    );
+
+    $('card').classList.remove('revealed');
+
+    $('card').setAttribute(
+      'aria-pressed',
+      'false'
+    );
+
+    $('next').classList.add('hidden');
+
+    $('next').textContent =
+      turn === roles.length - 1
+        ? 'Terminar reparto'
+        : 'Ocultar y continuar';
+  }
+
+  /* GIRAR CARTA */
+
+  $('card').addEventListener('click', () => {
+    if (locked || changingCard) return;
+
+    locked = true;
+
+    const role = roles[turn];
+
+    $('frontName').textContent = role.name;
+    $('frontWord').textContent = role.word;
+
+    $('card').classList.add('revealed');
+
+    $('card').setAttribute(
+      'aria-pressed',
+      'true'
+    );
+
+    $('next').classList.remove('hidden');
+  });
+
+  /* SIGUIENTE CARTA */
+
+  $('next').addEventListener('click', () => {
+    if (!locked || changingCard) return;
+
+    changingCard = true;
+
+    const nextButton = $('next');
+    nextButton.disabled = true;
+
+    $('card').classList.remove('revealed');
+
+    $('card').setAttribute(
+      'aria-pressed',
+      'false'
+    );
+
+    nextButton.classList.add('hidden');
+
+    const finishTransition = () => {
+      $('frontName').textContent = '';
+      $('frontWord').textContent = '';
+
+      turn++;
+
+      if (turn < roles.length) {
+        deal();
+      } else {
+        $('starter').textContent =
+          roles[rand(roles.length)].name;
+
+        show('end');
+      }
+
+      nextButton.disabled = false;
+      changingCard = false;
+    };
+
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    if (reduceMotion) {
+      finishTransition();
+    } else {
+      setTimeout(finishTransition, 570);
+    }
+  });
+
+  /* BOTONES */
+
+  $('gear').addEventListener('click', () => {
+    if (
+      $('deal').classList.contains('active') &&
+      !confirm('¿Salir del reparto?')
+    ) {
+      return;
+    }
+
+    renderNames();
+    show('settings');
+  });
+
+  $('homeStart').addEventListener('click', () => {
+    renderNames();
+    show('settings');
+  });
+
+  $('addPlayer').addEventListener('click', () => {
+    if (players.length >= 30) return;
+
+    players.push('');
+
+    renderNames();
+    save();
+
+    $('names')
+      .lastElementChild
+      .querySelector('input')
+      .focus();
+  });
+
+  $('minus').addEventListener('click', () => {
+    traitors--;
+    counter();
+    save();
+  });
+
+  $('plus').addEventListener('click', () => {
+    traitors++;
+    counter();
+    save();
+  });
+
+  $('begin').addEventListener('click', start);
+
+  $('again').addEventListener('click', start);
+
+  $('edit').addEventListener('click', () => {
+    renderNames();
+    show('settings');
+  });
+
+  /* INICIALIZACIÓN */
+
+  renderNames();
+
+})();
+</script>
+
+<!-- REGISTRO DEL SERVICE WORKER -->
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('./service-worker.js', {
+        scope: './'
+      })
+      .then(registration => {
+        console.log(
+          'Service Worker registrado:',
+          registration.scope
+        );
+      })
+      .catch(error => {
+        console.error(
+          'Error al registrar Service Worker:',
+          error
+        );
+      });
+  });
+}
+</script>
+
+</body>
+</html>
